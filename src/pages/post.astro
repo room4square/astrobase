@@ -1,0 +1,64 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+
+if (Astro.request.method === 'POST') {
+    const formData = await Astro.request.formData();
+    const title = formData.get('title');
+    const content = formData.get('content');
+    
+    // Create the data object to send
+    const datalog = { title, content };
+    
+    // Send the data as JSON to your backend
+    const response = await fetch('http://localhost:4000/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(datalog),
+    });
+
+    // Handle the response from the server
+    if (response.ok) {
+        const jsonResponse = await response.json();
+        console.log('Success:', jsonResponse);
+    } else {
+        console.error('Error:', response.statusText);
+    }
+}
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{SITE_TITLE}</title>
+    <meta name="description" content={SITE_DESCRIPTION} />
+    <BaseHead />
+</head>
+<body>
+    <Header />
+    <form method="POST" name="data" onsubmit="handleSubmit(event)">
+        <label>
+            Title:
+            <input type="text" name="title" required />
+        </label>
+        <label>
+            Content:
+            <input type="text" name="content" required />
+        </label>
+        <button type="submit">Submit</button>
+    </form>
+    <Footer />
+
+    <script>
+        function handleSubmit(event) {
+            event.preventDefault(); // Prevent the default form submission
+        }
+    </script>
+</body>
+</html>
